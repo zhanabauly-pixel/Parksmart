@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PARKSMART — smart parking in Astana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F5F8;--card:#fff;--ink:#101B26;--mute:#506271;--line:#CFD9E2;--pri:#1D6FB8;--pri-ink:#fff;--acc:#E39A00;--ok:#1B8A4B;--bad:#B3261E;--busy:#8896A3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D141C;--card:#16212C;--ink:#E7EEF4;--mute:#97A9B8;--line:#27394A;--pri:#5AA9E6;--pri-ink:#0D141C;--acc:#FFB830;--ok:#4CD08A;--bad:#FF8A80;--busy:#6B7D8C;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D141C;--card:#16212C;--ink:#E7EEF4;--mute:#97A9B8;--line:#27394A;--pri:#5AA9E6;--pri-ink:#0D141C;--acc:#FFB830;--ok:#4CD08A;--bad:#FF8A80;--busy:#6B7D8C;color-scheme:dark}
+*{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,"Segoe UI",Arial,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+h1,h2,h3{margin:0 0 8px;line-height:1.2}
+h1{font-size:clamp(30px,5vw,48px);letter-spacing:-.02em}
+h2{font-size:24px}h3{font-size:17px}
+p{margin:0 0 12px}
+.mute{color:var(--mute)}.sm{font-size:14px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.logo{font-weight:600;font-size:19px}.logo b{color:var(--pri)}
+.tabs{display:flex;gap:4px;overflow-x:auto;max-width:100%}
+.tabs button{background:none;border:0;color:var(--mute);font:500 14.5px inherit;font-family:inherit;padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-current="page"]{background:var(--pri);color:var(--pri-ink)}
+.tabs button:hover:not([aria-current]){color:var(--ink);background:var(--bg)}
+main{max-width:1100px;margin:0 auto;padding:22px 16px 60px}
+.scr{display:none}.scr.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+@media(max-width:760px){.g2{grid-template-columns:1fr}}
+.tile b{display:block;font-size:28px;line-height:1.1}
+.btn{background:var(--pri);color:var(--pri-ink);border:0;border-radius:8px;padding:10px 18px;font:600 15px inherit;font-family:inherit;cursor:pointer}
+.btn.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{padding:6px 12px;font-size:13.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+label{display:block;font-size:14px;color:var(--mute);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+input[type=range]{padding:0}
+.msg{min-height:22px;font-size:14px;margin:8px 0 0;color:var(--bad)}.msg.ok{color:var(--ok)}
+.hero{padding:34px 0 10px;max-width:640px}
+.center{text-align:center;margin:0 auto}
+.map{position:relative;height:230px;border-radius:8px;border:1px solid var(--line);background:repeating-linear-gradient(0deg,transparent 0 39px,var(--line) 39px 40px),repeating-linear-gradient(90deg,transparent 0 39px,var(--line) 39px 40px);margin-bottom:14px}
+.pin{position:absolute;transform:translate(-50%,-50%);background:var(--card);border:2px solid var(--pri);color:var(--ink);border-radius:20px;padding:3px 10px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.pin[aria-pressed="true"]{background:var(--acc);border-color:var(--ink);color:#101B26}
+.lot{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.lot:first-child{border-top:0}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.sp{aspect-ratio:3/4;border:2px solid var(--pri);border-radius:4px;background:transparent;color:var(--ink);font:600 12.5px inherit;font-family:inherit;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px}
+.sp.busy{border-color:var(--busy);color:var(--mute);cursor:not-allowed;background:repeating-linear-gradient(45deg,transparent 0 5px,color-mix(in srgb,var(--busy) 40%,transparent) 5px 7px)}
+.sp.fault{border-color:var(--bad);border-style:dashed;color:var(--bad);cursor:not-allowed}
+.sp.mine{background:var(--acc);border-color:var(--ink);color:#101B26}
+.sp.sel{outline:3px solid var(--ink);outline-offset:2px}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--mute);margin-top:10px}
+.ticket{border:2px dashed var(--ink);border-radius:10px;padding:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.ticket svg{width:96px;height:96px;background:#fff;padding:6px;border-radius:6px}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);font-size:14.5px}
+.scroll{overflow-x:auto}
+.bar2{height:12px;border-radius:6px;background:var(--line);overflow:hidden}.bar2 i{display:block;height:100%;background:var(--pri)}
+details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;font-weight:600}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.chip{display:inline-block;padding:2px 10px;border-radius:12px;border:1.5px solid var(--line);font-size:13px}
+.chip.ok{border-color:var(--ok);color:var(--ok)}.chip.bad{border-color:var(--bad);color:var(--bad)}
+ul.pl{margin:0 0 12px;padding-left:20px}ul.pl li{margin-bottom:5px}
+</style>
+</head>
+<body>
+<header><div class="bar">
+<div class="logo">PARK<b>SMART</b> Astana</div>
+<nav class="tabs" id="tabs" aria-label="Main" hidden></nav>
+<div class="row" style="gap:8px"><span class="chip ok" id="who" hidden></span><button class="btn alt sm" id="theme" type="button">Theme</button></div>
+</div></header>
+<main>
+
+<!-- 1 Launch -->
+<section class="scr on" id="launch"><div class="hero">
+<h1>Find, book and pay for parking in Astana</h1>
+<p class="mute" style="font-size:18px">Drivers spend 15–20 minutes every day looking for a space. PARKSMART shows free spots in real time, reserves the exact one and pays automatically when you leave.</p>
+<button class="btn" data-go="login" type="button">Get started</button>
+<div class="g3" style="margin-top:28px"><div class="card tile"><b>15–20 min</b><span class="mute sm">daily search time today</span></div><div class="card tile"><b>−40%</b><span class="mute sm">search time goal</span></div><div class="card tile"><b>−35%</b><span class="mute sm">hardware cost goal vs European systems</span></div></div>
+</div></section>
+
+<!-- 2 Login -->
+<section class="scr" id="login"><div class="card" style="max-width:440px;margin:20px auto">
+<h2 id="ltitle">Log in</h2>
+<div id="step1">
+<label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="name@example.com">
+<label for="pass">Password (8+ characters)</label><input id="pass" type="password" autocomplete="current-password">
+<p class="msg" id="lmsg" role="alert"></p>
+<div class="row"><button class="btn" id="lgo" type="button">Continue</button><button class="btn alt" id="lsw" type="button">Create account</button></div>
+</div>
+<div id="step2" hidden>
+<p class="mute">Two-factor check: enter the 6-digit code. Demo code: <b>482913</b></p>
+<label for="code">Code</label><input id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+<p class="msg" id="cmsg" role="alert"></p>
+<button class="btn" id="cgo" type="button">Verify and open map</button>
+</div>
+<p class="sm mute" style="margin-top:14px">Passwords are hashed on a real server. This demo stores nothing.</p>
+</div></section>
+
+<!-- 3-4 Home / Find -->
+<section class="scr" id="home">
+<div class="g3"><div class="card tile"><b id="sFree">0</b><span class="mute sm">free spots right now</span></div><div class="card tile"><b id="sAvg">0 ₸</b><span class="mute sm">average price per hour</span></div><div class="card tile"><b id="sSens">0</b><span class="mute sm">sensors online</span></div></div>
+<div class="g2"><div class="card"><h2>Map and search</h2>
+<div class="row"><input id="q" placeholder="Search a place" aria-label="Search a place" style="flex:2;min-width:140px"><select id="sort" aria-label="Sort" style="flex:1;min-width:120px"><option value="d">Nearest</option><option value="p">Cheapest</option><option value="f">Most free</option></select></div>
+<div class="map" id="mapbox" style="margin-top:12px"></div><div id="list"></div></div>
+<div class="card" id="details"></div></div>
+</section>
+
+<!-- 5 Book -->
+<section class="scr" id="book"><div class="g2">
+<div class="card"><h2>Choose a spot</h2><p class="mute" id="blot"></p><div class="grid" id="bgrid"></div>
+<div class="leg"><span>Outlined: free</span><span>Hatched: occupied</span><span>Yellow: yours</span><span>Dashed red: sensor fault</span></div></div>
+<div class="card" id="bform"></div></div></section>
+
+<!-- 6 Pay -->
+<section class="scr" id="pay"><div class="g2">
+<div class="card"><h2>Add card</h2><div id="cardbox"></div></div>
+<div class="card"><h2>Auto-pay and receipt</h2>
+<label class="row" style="color:var(--ink);font-size:16px;margin:0 0 10px"><span>Pay automatically on exit</span><input type="checkbox" id="auto" checked style="width:auto"></label>
+<p class="mute sm">When the camera reads your plate at the exit gate, the booking is charged to your card.</p>
+<button class="btn" id="exitbtn" type="button">Simulate exit gate</button><p class="msg" id="pmsg" role="alert"></p><div id="receipt"></div></div></div></section>
+
+<!-- 7 Account -->
+<section class="scr" id="acc"><div class="g2"><div>
+<div class="card"><h2>Profile and cars</h2><div id="prof"></div></div>
+<div class="card"><h2>Security</h2><label for="np">New password (8+ characters)</label><input id="np" type="password" autocomplete="new-password"><div class="bar2" style="margin-top:8px"><i id="str" style="width:0"></i></div>
+<button class="btn sm" id="chp" type="button" style="margin-top:10px">Change password</button>
+<label class="row" style="color:var(--ink);font-size:16px;margin-top:14px"><span>Two-factor authentication</span><input type="checkbox" id="tfa" checked style="width:auto"></label><p class="msg" id="amsg" role="alert"></p></div></div>
+<div class="card"><h2>History</h2><div id="hist"></div><button class="btn alt sm" data-go="login" id="logout" type="button" style="margin-top:12px">Log out</button></div></div></section>
+
+<!-- 8 Support -->
+<section class="scr" id="sup"><div class="g2">
+<div class="card"><h2>FAQ</h2>
+<details><summary>How does PARKSMART know a spot is free?</summary><p class="mute">An ultrasonic sensor on each spot reports whether a car is there. An AI camera at the entrance reads plates.</p></details>
+<details><summary>Why does the price change?</summary><p class="mute">Prices rise when the lot is nearly full and fall when it is empty, which spreads drivers across lots.</p></details>
+<details><summary>Is my card number stored?</summary><p class="mute">No. Only the last 4 digits are kept. The payment provider handles the rest.</p></details>
+<details><summary>What happens in winter?</summary><p class="mute">Sensors are weatherproof and tested in cold conditions. If one fails, staff see a fault and the spot is hidden from booking.</p></details></div>
+<div class="card"><h2>Contact us</h2><label for="topic">Topic</label><select id="topic"><option>Broken sensor</option><option>Payment problem</option><option>Other</option></select>
+<label for="txt">Message</label><textarea id="txt" rows="4"></textarea><p class="msg" id="smsg" role="alert"></p><button class="btn" id="send" type="button">Send message</button></div></div></section>
+
+<!-- About -->
+<section class="scr" id="about">
+<div class="card"><h2>The problem</h2><p>Drivers waste fuel, add to traffic and raise CO₂ emissions while they circle for parking. PARKSMART combines smart sensors, AI cameras and a mobile app to cut search time by 40%.</p>
+<p class="mute">Main project risks: harsh winters, sensor errors, low user interest and data leaks.</p></div>
+<div class="card"><h2>Budget hardware</h2><div class="scroll"><table><thead><tr><th>Part</th><th>Affordable choice</th><th>Price (approx.)</th></tr></thead><tbody>
+<tr><td>Spot sensor</td><td>JSN-SR04T ultrasonic</td><td>$4–6</td></tr><tr><td>Controller</td><td>ESP32</td><td>$5–7</td></tr><tr><td>Camera</td><td>TP-Link Tapo C310</td><td>$30–40</td></tr><tr><td>AI unit</td><td>Raspberry Pi + OpenALPR</td><td>$35–60</td></tr><tr><td>Entrance scanner</td><td>GM65 QR module</td><td>$10–15</td></tr></tbody></table></div>
+<p class="sm mute" style="margin-top:10px">Compared with Parkable, ParkingSpace and ParkMate, PARKSMART joins real-time availability, exact-spot booking, automatic payment and dynamic pricing in one system.</p></div>
+<h2>Cybersecurity</h2>
+<div class="g2">
+<div class="card"><h3>Unauthorized access</h3><p class="mute">Strong hashed passwords, two-factor authentication and role-based access.</p></div>
+<div class="card"><h3>Secure payment</h3><p class="mute">Trusted providers, secure gateways and HTTPS. Unneeded card data is never stored.</p></div>
+<div class="card"><h3>Secure communication</h3><p class="mute">HTTPS with TLS for app, sensors and servers. VPN for administrators.</p></div>
+<div class="card"><h3>Database threats</h3><p class="mute">Input validation against SQL injection, updates, backups, monitoring and regular security tests.</p></div></div>
+<p class="sm mute">Team: Timur, Nurislam, Gayz, Nurkhan. Student project for Information and Communication Technology.</p></section>
+
+<!-- Admin -->
+<section class="scr" id="admin">
+<div class="card" id="agate" style="max-width:440px"><h2>Admin login</h2><p class="mute">Staff only. Demo staff code: <b>990011</b></p><label for="acode">Staff code</label><input id="acode" inputmode="numeric" maxlength="6"><p class="msg" id="agm" role="alert"></p><button class="btn" id="ago" type="button">Open admin panel</button></div>
+<div id="apanel" hidden>
+<div class="g2"><div class="card"><h2>Dashboard</h2><div id="adash"></div></div>
+<div class="card"><h2>Pricing</h2><label for="base">Base price per hour: <b id="bv"></b></label><input type="range" id="base" min="150" max="500" step="10" value="250"><p class="sm mute">The final price moves from 80% to 160% of the base as a lot fills up.</p></div></div>
+<div class="g2"><div class="card"><h2>Sensor monitor</h2><div class="scroll" id="sens"></div></div>
+<div class="card"><h2>Reports</h2><div id="rep"></div></div></div></div></section>
+
+</main>
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var lots=[{k:'M',n:'Mega Silk Way',a:'Kabanbay Batyr Ave, 62',d:1.2,x:72,y:64,h:'24/7'},{k:'K',n:'Khan Shatyr',a:'Turan Ave, 37',d:2.4,x:26,y:30,h:'10:00–23:00'},{k:'A',n:'Abu Dhabi Plaza',a:'Sighnak St, 16',d:3.1,x:50,y:20,h:'24/7'},{k:'T',n:'Triumphal Arch lot',a:'Mangilik El Ave',d:0.8,x:40,y:72,h:'24/7'}];
+lots.forEach(function(l){l.sp=[];for(var i=1;i<=24;i++)l.sp.push({id:l.k+i,busy:Math.random()<.5,fault:false,mine:false})});
+var S={user:null,lot:0,sel:null,booking:null,card:null,cars:[],hist:[{t:'Example booking',a:'−300 ₸',s:'Paid'}],base:250,income:1200,bookings:3,pw:'',tickets:0};
+var tabs=[['home','Map'],['book','Book'],['pay','Pay'],['acc','Account'],['sup','Support'],['about','Project'],['admin','Admin']];
+var cur='launch';
+function occ(l){return l.sp.filter(function(s){return s.busy||s.mine}).length/l.sp.length}
+function free(l){return l.sp.filter(function(s){return !s.busy&&!s.mine&&!s.fault}).length}
+function rate(l){return Math.round(S.base*(0.8+occ(l)*0.8)/10)*10}
+function go(id){
+ if(!S.user&&id!=='launch'&&id!=='login'){id='login'}
+ if(id==='login'){$('#step1').hidden=false;$('#step2').hidden=true}
+ cur=id;$$('.scr').forEach(function(e){e.classList.toggle('on',e.id===id)});
+ $$('#tabs button').forEach(function(b){if(b.dataset.t===id)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+ render();window.scrollTo(0,0);
+}
+$$('[data-go]').forEach(function(b){b.addEventListener('click',function(){if(b.id==='logout'){S.user=null;$('#tabs').hidden=true;$('#who').hidden=true}go(b.dataset.go)})});
+$('#tabs').innerHTML=tabs.map(function(t){return '<button type="button" data-t="'+t[0]+'">'+t[1]+'</button>'}).join('');
+$$('#tabs button').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.t)})});
+$('#theme').onclick=function(){var d=document.documentElement,dk=d.dataset.theme?d.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;d.dataset.theme=dk?'light':'dark'};
+
+/* login */
+var reg=false;
+$('#lsw').onclick=function(){reg=!reg;$('#ltitle').textContent=reg?'Create account':'Log in';$('#lsw').textContent=reg?'I have an account':'Create account'};
+$('#lgo').onclick=function(){var e=$('#email').value.trim(),p=$('#pass').value;
+ if(!/^\S+@\S+\.\S+$/.test(e)){$('#lmsg').textContent='Enter a valid email, for example name@example.com.';return}
+ if(p.length<8){$('#lmsg').textContent='Password must have at least 8 characters.';return}
+ $('#lmsg').textContent='';S.pw=p;$('#step1').hidden=true;$('#step2').hidden=false;$('#code').focus()};
+$('#cgo').onclick=function(){if($('#code').value!=='482913'){$('#cmsg').textContent='Wrong code. Use the demo code 482913.';return}
+ S.user=$('#email').value.trim();$('#who').textContent=S.user.split('@')[0];$('#who').hidden=false;$('#tabs').hidden=false;$('#cmsg').textContent='';go('home')};
+
+/* home / find */
+function sorted(){var q=$('#q').value.toLowerCase(),m=$('#sort').value;
+ return lots.map(function(l,i){return{l:l,i:i}}).filter(function(o){return o.l.n.toLowerCase().indexOf(q)>-1}).sort(function(a,b){return m==='p'?rate(a.l)-rate(b.l):m==='f'?free(b.l)-free(a.l):a.l.d-b.l.d})}
+function rHome(){
+ $('#sFree').textContent=lots.reduce(function(a,l){return a+free(l)},0);
+ $('#sAvg').textContent=Math.round(lots.reduce(function(a,l){return a+rate(l)},0)/lots.length)+' ₸';
+ $('#sSens').textContent=lots.reduce(function(a,l){return a+l.sp.filter(function(s){return !s.fault}).length},0)+' / '+lots.length*24;
+ var o=sorted();
+ $('#mapbox').innerHTML=o.map(function(x){return '<button class="pin" type="button" data-i="'+x.i+'" aria-pressed="'+(x.i===S.lot)+'" style="left:'+x.l.x+'%;top:'+x.l.y+'%">'+x.l.k+' · '+free(x.l)+'</button>'}).join('');
+ $('#list').innerHTML=o.length?o.map(function(x){return '<div class="lot"><div><b>'+esc(x.l.n)+'</b><div class="sm mute">'+esc(x.l.a)+' · '+x.l.d+' km</div></div><div class="row" style="gap:10px"><span class="sm">'+free(x.l)+' free · '+rate(x.l)+' ₸/h</span><button class="btn alt sm" type="button" data-i="'+x.i+'">Details</button></div></div>'}).join(''):'<p class="mute">No places match “'+esc($('#q').value)+'”. Try another name.</p>';
+ $$('#mapbox .pin,#list [data-i]').forEach(function(b){b.onclick=function(){S.lot=+b.dataset.i;S.sel=null;rHome()}});
+ var l=lots[S.lot];
+ $('#details').innerHTML='<h2>Spot details</h2><h3>'+esc(l.n)+'</h3><p class="mute">'+esc(l.a)+'</p><table><tr><td>Free spots</td><td><b>'+free(l)+' of 24</b></td></tr><tr><td>Price now</td><td><b>'+rate(l)+' ₸ per hour</b></td></tr><tr><td>Distance</td><td>'+l.d+' km</td></tr><tr><td>Open</td><td>'+l.h+'</td></tr></table><p style="margin-top:14px"><button class="btn" type="button" id="tobook">Choose a spot here</button></p>';
+ $('#tobook').onclick=function(){go('book')};
+}
+$('#q').oninput=rHome;$('#sort').onchange=rHome;
+
+/* book */
+function qr(code){var h=0,i,x,y,s='';for(i=0;i<code.length;i++)h=(h*31+code.charCodeAt(i))>>>0;
+ for(y=0;y<11;y++)for(x=0;x<11;x++){var fin=(x<3&&y<3)||(x>7&&y<3)||(x<3&&y>7);h=(h*1103515245+12345)>>>0;if(fin||(h>>>16)%2)s+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>'}
+ return '<svg viewBox="0 0 11 11" role="img" aria-label="Booking QR code (demo)" fill="#000">'+s+'</svg>'}
+function rGrid(){var l=lots[S.lot];$('#blot').textContent=l.n+' · '+free(l)+' free · '+rate(l)+' ₸ per hour';
+ $('#bgrid').innerHTML=l.sp.map(function(s){var c='sp',st='free';if(s.mine){c+=' mine';st='yours'}else if(s.fault){c+=' fault';st='sensor fault'}else if(s.busy){c+=' busy';st='occupied'}if(s.id===S.sel)c+=' sel';
+  return '<button class="'+c+'" type="button" data-id="'+s.id+'" aria-label="Spot '+s.id+', '+st+'"'+((s.busy||s.fault)&&!s.mine?' disabled':'')+'>'+s.id+'</button>'}).join('');
+ $$('#bgrid .sp').forEach(function(b){b.onclick=function(){if(S.booking){$('#bform').insertAdjacentHTML('afterbegin','<p class="msg">Cancel your current booking first.</p>');return}S.sel=b.dataset.id;rGrid();rForm()}});
+ var p=$('#pp');if(p)p.textContent=(rate(l)*$('#dur').value)+' ₸'}
+function rForm(){var l=lots[S.lot],f=$('#bform');
+ if(S.booking){var b=S.booking;f.innerHTML='<h2>Booking confirmed</h2><div class="ticket">'+qr(b.code)+'<div><p style="margin:0">Spot <b>'+esc(b.id)+'</b> at '+esc(b.lot)+'</p><p style="margin:0">Code <b>'+b.code+'</b></p><p class="sm mute" style="margin:0">Plate '+esc(b.plate)+' · '+b.h+' h · '+b.price+' ₸</p></div></div><p class="sm mute" style="margin-top:10px">Scan at the entrance. You will be charged on exit.</p><button class="btn alt" id="cancel" type="button">Cancel booking</button>';
+  $('#cancel').onclick=function(){lots.forEach(function(x){x.sp.forEach(function(s){s.mine=false})});S.booking=null;S.sel=null;rGrid();rForm()};return}
+ if(!S.sel){f.innerHTML='<h2>Confirm booking</h2><p class="mute">Pick a free spot on the grid to continue.</p>';return}
+ f.innerHTML='<h2>Confirm booking</h2><p>Spot <b>'+esc(S.sel)+'</b> at '+esc(l.n)+'</p><label for="plate">Car plate</label><input id="plate" maxlength="8" placeholder="123ABC01" list="cars"><datalist id="cars">'+S.cars.map(function(c){return '<option value="'+esc(c)+'">'}).join('')+'</datalist><label for="dur">Time</label><select id="dur"><option value="1">1 hour</option><option value="2">2 hours</option><option value="3">3 hours</option><option value="4">4 hours</option></select><p style="font-size:22px;font-weight:600;margin:12px 0 0" id="pp"></p><p class="sm mute">Price depends on how full the lot is.</p><p class="msg" id="bm" role="alert"></p><button class="btn" id="conf" type="button">Confirm booking</button>';
+ $('#plate').oninput=function(){this.value=this.value.toUpperCase()};$('#dur').onchange=rGrid;rGrid();
+ $('#conf').onclick=function(){var pl=$('#plate').value;if(!/^\d{3}[A-Z]{3}\d{2}$/.test(pl)){$('#bm').textContent='Use the format 123ABC01: three digits, three letters, two digits.';return}
+  var s=l.sp.filter(function(x){return x.id===S.sel})[0];if(s.busy||s.fault){$('#bm').textContent='This spot was just taken. Pick another one.';S.sel=null;rGrid();rForm();return}
+  var h=+$('#dur').value;s.mine=true;S.booking={id:s.id,lot:l.n,li:S.lot,plate:pl,h:h,price:rate(l)*h,code:'PS-'+Math.floor(1000+Math.random()*9000)};S.bookings++;rGrid();rForm()}}
+
+/* pay */
+function rPay(){var c=S.card;
+ $('#cardbox').innerHTML=c?'<p>Card ending in <b>'+c+'</b> is linked.</p><button class="btn alt sm" id="rmc" type="button">Remove card</button>':'<label for="cn">Card number</label><input id="cn" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000"><label for="ce">Expiry (MM/YY)</label><input id="ce" maxlength="5" placeholder="08/28"><p class="msg" id="cm" role="alert"></p><button class="btn" id="addc" type="button">Add card</button><p class="sm mute" style="margin-top:8px">Only the last 4 digits are kept.</p>';
+ if(c)$('#rmc').onclick=function(){S.card=null;rPay()};
+ else $('#addc').onclick=function(){var n=$('#cn').value.replace(/\s/g,'');if(!/^\d{16}$/.test(n)){$('#cm').textContent='Card number must have 16 digits.';return}
+  if(!/^(0[1-9]|1[0-2])\/\d{2}$/.test($('#ce').value)){$('#cm').textContent='Expiry must look like 08/28.';return}S.card=n.slice(-4);rPay()}}
+$('#exitbtn').onclick=function(){var m=$('#pmsg');m.className='msg';
+ if(!S.booking){m.textContent='No active booking. Book a spot first.';return}
+ if(!S.card){m.textContent='Add a card first, then try the exit gate again.';return}
+ if(!$('#auto').checked){m.textContent='Auto-pay is off. Turn it on to pay at the gate.';return}
+ var b=S.booking;S.income+=b.price;S.hist.unshift({t:b.lot+', spot '+b.id,a:'−'+b.price+' ₸',s:'Paid with card •••• '+S.card});
+ $('#receipt').innerHTML='<div class="ticket" style="margin-top:12px"><div><b>Receipt</b><p style="margin:4px 0 0">'+esc(b.lot)+', spot '+esc(b.id)+'</p><p style="margin:0">Plate '+esc(b.plate)+' · '+b.h+' h</p><p style="margin:0"><b>'+b.price+' ₸</b> · card •••• '+S.card+'</p></div></div>';
+ lots.forEach(function(x){x.sp.forEach(function(s){s.mine=false})});S.booking=null;S.sel=null;m.className='msg ok';m.textContent='Gate opened. Payment completed.'};
+
+/* account */
+function rAcc(){
+ $('#prof').innerHTML='<p class="mute">'+esc(S.user||'')+'</p><label for="nc">Add a car plate</label><div class="row"><input id="nc" maxlength="8" placeholder="123ABC01" style="flex:1"><button class="btn sm" id="addcar" type="button">Add</button></div><p class="msg" id="pm2" role="alert"></p>'+(S.cars.length?S.cars.map(function(c,i){return '<div class="lot"><b>'+esc(c)+'</b><button class="btn alt sm" type="button" data-r="'+i+'">Remove</button></div>'}).join(''):'<p class="mute">No cars yet. Add one to book faster.</p>');
+ $('#nc').oninput=function(){this.value=this.value.toUpperCase()};
+ $('#addcar').onclick=function(){var v=$('#nc').value;if(!/^\d{3}[A-Z]{3}\d{2}$/.test(v)){$('#pm2').textContent='Use the format 123ABC01.';return}if(S.cars.indexOf(v)<0)S.cars.push(v);rAcc()};
+ $$('#prof [data-r]').forEach(function(b){b.onclick=function(){S.cars.splice(+b.dataset.r,1);rAcc()}});
+ $('#hist').innerHTML=S.hist.map(function(h){return '<div class="lot"><div><b>'+esc(h.t)+'</b><div class="sm mute">'+esc(h.s)+'</div></div><b>'+esc(h.a)+'</b></div>'}).join('')}
+$('#np').oninput=function(){var v=this.value,sc=(v.length>=8)+(/[A-Z]/.test(v)&&/[a-z]/.test(v))+(/\d/.test(v))+(/[^\w]/.test(v));$('#str').style.width=(sc*25)+'%'};
+$('#chp').onclick=function(){var m=$('#amsg');if($('#np').value.length<8){m.className='msg';m.textContent='Password must have at least 8 characters.';return}m.className='msg ok';m.textContent='Password changed.';$('#np').value='';$('#str').style.width='0'};
+$('#tfa').onchange=function(){var m=$('#amsg');m.className='msg';m.textContent=this.checked?'':'Two-factor is off. Your account is easier to break into.'};
+
+/* support */
+$('#send').onclick=function(){var m=$('#smsg');if($('#txt').value.trim().length<5){m.className='msg';m.textContent='Describe the problem in a few words.';return}
+ S.tickets++;m.className='msg ok';m.textContent='Thanks. Ticket #'+(1000+S.tickets)+' was created.';$('#txt').value=''};
+
+/* admin */
+var staff=false;
+$('#ago').onclick=function(){if($('#acode').value!=='990011'){$('#agm').textContent='Wrong staff code. Use the demo code 990011.';return}staff=true;rAdmin()};
+$('#base').oninput=function(){S.base=+this.value;rAdmin()};
+function rAdmin(){$('#agate').hidden=staff;$('#apanel').hidden=!staff;if(!staff)return;
+ $('#bv').textContent=S.base+' ₸';
+ $('#adash').innerHTML=lots.map(function(l){var o=Math.round(occ(l)*100);return '<div style="margin-bottom:10px"><div class="row sm"><span>'+esc(l.n)+'</span><span>'+o+'% full · '+rate(l)+' ₸/h</span></div><div class="bar2"><i style="width:'+o+'%"></i></div></div>'}).join('');
+ var rows='';lots.forEach(function(l,i){l.sp.slice(0,3).forEach(function(s){rows+='<tr><td>'+s.id+'</td><td><span class="chip '+(s.fault?'bad':'ok')+'">'+(s.fault?'Fault':'Online')+'</span></td><td><button class="btn alt sm" type="button" data-f="'+i+':'+s.id+'">'+(s.fault?'Mark repaired':'Simulate fault')+'</button></td></tr>'})});
+ $('#sens').innerHTML='<table><thead><tr><th>Spot</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+ $$('#sens [data-f]').forEach(function(b){b.onclick=function(){var p=b.dataset.f.split(':'),s=lots[+p[0]].sp.filter(function(x){return x.id===p[1]})[0];s.fault=!s.fault;if(s.fault&&s.mine){s.mine=false;S.booking=null}rAdmin()}});
+ $('#rep').innerHTML='<table><tr><td>Bookings</td><td><b>'+S.bookings+'</b></td></tr><tr><td>Income (demo)</td><td><b>'+S.income+' ₸</b></td></tr><tr><td>Sensor faults</td><td><b>'+lots.reduce(function(a,l){return a+l.sp.filter(function(s){return s.fault}).length},0)+'</b></td></tr></table>'}
+
+function render(){
+ if(cur==='home')rHome();else if(cur==='book'){rGrid();rForm()}else if(cur==='pay')rPay();else if(cur==='acc')rAcc();else if(cur==='admin')rAdmin()}
+setInterval(function(){var l=lots[Math.floor(Math.random()*lots.length)],pool=l.sp.filter(function(s){return !s.mine&&!s.fault&&s.id!==S.sel}),s=pool[Math.floor(Math.random()*pool.length)];if(!s)return;s.busy=!s.busy;
+ if(cur==='home')rHome();else if(cur==='book')rGrid();else if(cur==='admin')rAdmin()},4000);
+})();
+</script>
+</body>
+</html>
